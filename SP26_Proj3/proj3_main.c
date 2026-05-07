@@ -57,6 +57,14 @@ void wipe_LEDs();
 void initialize_Start_Screen(Graphics_Context *g_sContext_p);
 void initialize_Start_Screen_Timer();
 
+
+// --------------------------------------------------------
+// MENU SCREEN
+// --------------------------------------------------------
+void initialize_Menu_Screen(Graphics_Context *g_sContext_p);
+
+
+
 // --------------------------------------------------------
 // MAIN
 // --------------------------------------------------------
@@ -96,6 +104,15 @@ void initialize_Start_Screen(Graphics_Context *g_sContext_p){
     Graphics_drawStringCentered(g_sContext_p, (int8_t *)"SPRING 2026 PROJECT 3", AUTO_STRING_LENGTH, 64, 12, false);
     Graphics_drawStringCentered(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 64, 12, false);
     Graphics_drawStringCentered(g_sContext_p, (int8_t *)"By: Andrew Wallo V", AUTO_STRING_LENGTH, 74, 12, false);
+
+}
+
+
+
+// --------------------------------------------------------
+// MENU SCEEN
+// --------------------------------------------------------
+void initialize_Menu_Screen(Graphics_Context *g_sContext_p){
 
 }
 
@@ -152,7 +169,8 @@ void main_loop(Graphics_Context *g_sContext_p)
     switch(state){
 
     case START:
-        if(isStartScreen == false){
+        if(evaluateStartScreen() == false){
+            Graphics_clearDisplay(g_sContext_p);
             initialize_Menu_Screen(g_sContext_p);
             state = MENU;
         }

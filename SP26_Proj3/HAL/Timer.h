@@ -76,4 +76,7 @@ void InitSystemTiming();
 void startHWTimer(uint32_t waitTime_ms);
 bool HWTimerExpired();
 
+// Start Screen check function
+bool evaluateStartScreen();
+
 #endif /* HAL_TIMER_H_ */

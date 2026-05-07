@@ -11,7 +11,7 @@
 /** The reference counter which tracks how many rollovers have occurred. Used in
  * timing SWTimers. */
 static volatile uint64_t hwTimerRollovers;
-
+static volatile bool isStartScreen = true;
 /**
  * The ISR used to increment the total number of rollovers which have passed.
  * When the TIMER32_0_BASE timer expires, this ISR is automatically called. DO
@@ -21,6 +21,11 @@ static volatile uint64_t hwTimerRollovers;
 void T32_INT1_IRQHandler() {
     hwTimerRollovers++;
     Timer32_clearInterruptFlag(TIMER32_0_BASE);
+}
+
+void T32_INT2_IRQHandler(){
+    Timer32_clearInterruptFlag(TIMER32_1_BASE);
+    isStartScreen = false;
 }
 
 /**
@@ -151,4 +156,15 @@ uint64_t SWTimer_elapsedCycles(SWTimer* timer_p) {
 bool SWTimer_expired(SWTimer* timer_p) {
     uint64_t elapsedCycles = SWTimer_elapsedCycles(timer_p);
     return elapsedCycles >= timer_p->cyclesToWait;
+}
+
+
+bool evaluateStartScreen()
+{
+    if(isStartScreen){
+        return true;
+
+    } else {
+        return false;
+    }
 }

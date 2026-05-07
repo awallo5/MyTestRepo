@@ -15,7 +15,7 @@ void EUSCIA0_IRQHandler(){
     int stat = UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
     UART_clearInterruptFlag(EUSCI_A0_BASE, stat);
 
-    if(stat & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
+    if(stat && EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
         input_character = UART_receiveData(EUSCI_A0_BASE);
     }
 }

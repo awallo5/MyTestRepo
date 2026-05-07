@@ -316,12 +316,12 @@ void run_GAME3_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile 
 
     // Interrupt only occurs with new character... failure condtions?
     char c = UART_getChar2();
+    if(c != '\0'){
+        sprintf(character_array2, "Typed Character %c", c);
 
-    sprintf(character_array2, "Typed Character %c", c);
-
-    // opaque = true
-    Graphics_drawString(g_sContext_p, (int8_t *)character_array2, AUTO_STRING_LENGTH, 0, 10 * 7, true);
-
+        // opaque = true
+        Graphics_drawString(g_sContext_p, (int8_t *)character_array2, AUTO_STRING_LENGTH, 0, 10 * 7, true);
+    }
     // EXIT CONDITION
     if(buttons->LB2tapped){
         initialize_GAME4_Screen(g_sContext_p);

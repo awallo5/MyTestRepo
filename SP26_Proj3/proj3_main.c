@@ -11,13 +11,30 @@
 #include "HAL/LED.h"
 #include "HAL/Timer.h"
 
+                         // FUNCTION PROTOTYPES //
+
+// --------------------------------------------------------
+// GIVEN TEMPLATE FUNCTIONS
+// --------------------------------------------------------
+
 void initialize();
 void initGraphics(Graphics_Context *g_sContext_p);
 void main_loop(Graphics_Context *g_sContext_p);
 void sleep();
 
+// --------------------------------------------------------
+// COLOR LOGIC FUNCTIONS
+// --------------------------------------------------------
+void wipe_LEDs();
+
+
+// --------------------------------------------------------
+// MAIN
+// --------------------------------------------------------
+
 int main(void)
 {
+
     initialize();
     
     /* Graphics context. Works in the same as it did in the previous projects.
@@ -34,6 +51,29 @@ int main(void)
     }
 
 }
+
+
+// --------------------------------------------------------
+// COLOR LOGIC FUNCTIONS
+// --------------------------------------------------------
+
+// Turns off all lights
+void wipe_LEDs(){
+
+    TurnOff_LLR();
+    TurnOff_LLG();
+    TurnOff_LLB();
+    TurnOff_BLR();
+    TurnOff_BLG();
+    TurnOff_BLB();
+    TurnOff_LL1();
+}
+
+
+// --------------------------------------------------------
+// GIVEN TEMPLATE FUNCTIONS
+// --------------------------------------------------------
+
 
 void sleep()
 {

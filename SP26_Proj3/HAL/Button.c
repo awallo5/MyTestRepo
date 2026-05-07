@@ -79,7 +79,7 @@ void PORT1_IRQHandler() {
 void PORT3_IRQHandler() {
 
   if (GPIO_getInterruptStatus(GPIO_PORT_P3, GPIO_PIN5)) {
-    LB1modified = true;
+    BB2modified = true;
 
 
 
@@ -90,7 +90,7 @@ void PORT3_IRQHandler() {
 void PORT4_IRQHandler() {
 
   if (GPIO_getInterruptStatus(GPIO_PORT_P4, GPIO_PIN1)) {
-    LB1modified = true;
+    JSBmodified = true;
 
 
 
@@ -101,7 +101,7 @@ void PORT4_IRQHandler() {
 void PORT5_IRQHandler() {
 
   if (GPIO_getInterruptStatus(GPIO_PORT_P5, GPIO_PIN1)) {
-    LB1modified = true;
+    BB1modified = true;
 
 
 
@@ -131,7 +131,7 @@ bool LB1tapped() {
   if (debouncing && SWTimer_expired(&debounceTimer))
       {
        debouncing = false;
-       LB1modified = false;
+      // LB1modified = false; // This causes double-click error...
       }
 
 // if we are not in the debouncing state and a transition is detected
@@ -172,7 +172,7 @@ bool BB1tapped() {
   if (debouncing && SWTimer_expired(&debounceTimer))
       {
        debouncing = false;
-       BB1modified = false;
+      // BB1modified = false; // This causes double-click error...
       }
 
 // if we are not in the debouncing state and a transition is detected
@@ -214,7 +214,7 @@ bool BB2tapped() {
   if (debouncing && SWTimer_expired(&debounceTimer))
       {
        debouncing = false;
-       BB2modified = false;
+      // BB2modified = false; // This causes double-click error...
       }
 
 // if we are not in the debouncing state and a transition is detected
@@ -256,7 +256,7 @@ bool JSBtapped() {
   if (debouncing && SWTimer_expired(&debounceTimer))
       {
        debouncing = false;
-       JSBmodified = false;
+     //  JSBmodified = false; // This causes double-click error...
       }
 
 // if we are not in the debouncing state and a transition is detected

@@ -11,6 +11,15 @@
 #include "HAL/LED.h"
 #include "HAL/Timer.h"
 
+/* Application Header */
+
+
+// --------------------------------------------------------
+// MACROS
+// --------------------------------------------------------
+
+#define START_SCREEN_DELAY 96000000 // 2 seconds, Prescaler = 1
+
                          // FUNCTION PROTOTYPES //
 
 // --------------------------------------------------------
@@ -22,11 +31,31 @@ void initGraphics(Graphics_Context *g_sContext_p);
 void main_loop(Graphics_Context *g_sContext_p);
 void sleep();
 
+
+// --------------------------------------------------------
+// STRUCTURES
+// --------------------------------------------------------
+
+// FSM structure
+typedef enum {
+    START,
+    MENU,
+    INSTRUCTIONS,
+    GAME
+} FSM_state;
+
+
 // --------------------------------------------------------
 // COLOR LOGIC FUNCTIONS
 // --------------------------------------------------------
 void wipe_LEDs();
 
+
+// --------------------------------------------------------
+// START SCREEN
+// --------------------------------------------------------
+void initialize_Start_Screen(Graphics_Context *g_sContext_p);
+void initialize_Start_Screen_Timer();
 
 // --------------------------------------------------------
 // MAIN
@@ -43,6 +72,8 @@ int main(void)
     Graphics_Context g_sContext;
     initGraphics(&g_sContext);
 
+
+
     while (1)
     {
         sleep();
@@ -53,6 +84,30 @@ int main(void)
 }
 
 
+
+// --------------------------------------------------------
+// START SCREEN
+// --------------------------------------------------------
+
+void initialize_Start_Screen(Graphics_Context *g_sContext_p){
+
+    Graphics_clearDisplay(g_sContext_p);
+
+    Graphics_drawStringCentered(g_sContext_p, (int8_t *)"SPRING 2026 PROJECT 3", AUTO_STRING_LENGTH, 64, 12, false);
+    Graphics_drawStringCentered(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 64, 12, false);
+    Graphics_drawStringCentered(g_sContext_p, (int8_t *)"By: Andrew Wallo V", AUTO_STRING_LENGTH, 74, 12, false);
+
+}
+
+// 2-second start screen timer
+void initialize_Start_Screen_Timer(){
+
+    Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT, TIMER32_PERIODIC_MODE);
+    Timer32_setCount(TIMER32_0_BASE, START_SCREEN_DELAY);
+    Timer32_enableInterrupt(TIMER32_0_BASE);
+    Interrupt_enableInterrupt(INT_T32_INT2);
+    Timer32_startTimer(TIMER32_0_BASE, 1);
+}
 // --------------------------------------------------------
 // COLOR LOGIC FUNCTIONS
 // --------------------------------------------------------
@@ -90,8 +145,24 @@ void sleep()
 
 void main_loop(Graphics_Context *g_sContext_p)
 {
+
+    static volatile FSM_state state = START;
     buttons_t buttons = updateButtons();
 
+    switch(state){
+
+    case START:
+        if(isStartScreen == false){
+            initialize_Menu_Screen(g_sContext_p);
+            state = MENU;
+        }
+    case MENU:
+
+        break;
+
+    }
+
+    // TEST
     if (buttons.LB1tapped)
         Toggle_LL1();
 }
@@ -108,6 +179,7 @@ void initialize()
     initButtons();
 
     // add any other initializations here
+
 }
 
 void initGraphics(Graphics_Context *g_sContext_p)
@@ -127,4 +199,7 @@ void initGraphics(Graphics_Context *g_sContext_p)
 
     // apply changes by clearing background
     Graphics_clearDisplay(g_sContext_p);
+
+    // Show Start Screen Graphics
+    initialize_Start_Screen(g_sContext_p);
 }

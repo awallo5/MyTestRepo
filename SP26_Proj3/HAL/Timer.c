@@ -8,10 +8,14 @@
 #include <HAL/LED.h>
 #include <HAL/Timer.h>
 
+
+#define MAX_COUNTER_VAL 99999 // limited space on screen
+
 /** The reference counter which tracks how many rollovers have occurred. Used in
  * timing SWTimers. */
 static volatile uint64_t hwTimerRollovers;
 static volatile bool isStartScreen = true;
+static volatile int GAME2_count = 0;
 /**
  * The ISR used to increment the total number of rollovers which have passed.
  * When the TIMER32_0_BASE timer expires, this ISR is automatically called. DO
@@ -23,10 +27,40 @@ void T32_INT1_IRQHandler() {
     Timer32_clearInterruptFlag(TIMER32_0_BASE);
 }
 
+// GAME 2 TIMER FUNCTIONS
+
+void tare_GAME2_count(){
+    GAME2_count = 0;
+}
+
+int return_GAME2_count(){
+    return GAME2_count;
+}
+
+
+void config_GAME2_Timer32(){
+    Timer32_initModule(TIMER32_1_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT, TIMER32_PERIODIC_MODE);
+    Timer32_setCount(TIMER32_1_BASE, SYSTEM_CLOCK);
+    Timer32_enableInterrupt(TIMER32_1_BASE);
+    Interrupt_enableInterrupt(INT_T32_INT2);
+    Timer32_startTimer(TIMER32_1_BASE, 0); // Start Screen = 1 (one-shot), GAME2 = 0 (continuous)
+}
+
+
+// START SCREEN + GAME2: HW Timer
 void T32_INT2_IRQHandler(){
     Timer32_clearInterruptFlag(TIMER32_1_BASE);
-    isStartScreen = false;
+
+    if(isStartScreen){           // 1st Task
+        isStartScreen = false;
+    } else {                     // 2nd Task
+        GAME2_count++;
+        if(GAME2_count > MAX_COUNTER_VAL) {
+            tare_GAME2_count();
+        }
+    }
 }
+
 
 /**
  * Initializes the global system timing. This function should be called

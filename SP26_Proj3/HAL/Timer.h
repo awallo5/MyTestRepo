@@ -79,4 +79,9 @@ bool HWTimerExpired();
 // Start Screen check function
 bool evaluateStartScreen();
 
+// GAME2 TIMER VALUE FETCHING FUNCTIONS
+void tare_GAME2_count();
+int return_GAME2_count();
+void config_GAME2_Timer32();
+
 #endif /* HAL_TIMER_H_ */

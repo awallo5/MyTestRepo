@@ -6,6 +6,7 @@
 /* Standard includes */
 #include <stdio.h>
 
+
 /* HAL includes */
 #include "HAL/Button.h"
 #include "HAL/LED.h"
@@ -75,7 +76,7 @@ void initialize_Instructions_Screen(Graphics_Context *g_sContext_p);
 
 
 // --------------------------------------------------------
-// GAME FSM + SCREEN (4 games total)
+// GAME FUNCTIONS
 // --------------------------------------------------------
 
 void initialize_GAME1_Screen(Graphics_Context *g_sContext_p);
@@ -83,6 +84,9 @@ void run_GAME1_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile 
 
 void initialize_GAME2_Screen(Graphics_Context *g_sContext_p);
 void run_GAME2_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile FSM_state *state);
+
+        // HW Timer Config for GAME 2
+        void config_GAME2_Timer32();
 
 void initialize_GAME3_Screen(Graphics_Context *g_sContext_p);
 void run_GAME3_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile FSM_state *state);
@@ -236,16 +240,42 @@ void run_GAME1_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile 
 void initialize_GAME2_Screen(Graphics_Context *g_sContext_p){
     Graphics_clearDisplay(g_sContext_p);
     Graphics_drawString(g_sContext_p, (int8_t *)"Project 3: HW Timer", AUTO_STRING_LENGTH, 0, 10, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 0, 10 * 2, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 0, 10 * 3, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 0, 10 * 4, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 5, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 6, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 7, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 8, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"Configure a HW timer", AUTO_STRING_LENGTH, 0, 10 * 2, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"to increment a ", AUTO_STRING_LENGTH, 0, 10 * 3, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"counter once per", AUTO_STRING_LENGTH, 0, 10 * 4, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"second using", AUTO_STRING_LENGTH, 4, 10 * 5, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"interrupts. The", AUTO_STRING_LENGTH, 4, 10 * 6, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"count should be", AUTO_STRING_LENGTH, 4, 10 * 7, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"preserved.", AUTO_STRING_LENGTH, 4, 10 * 8, false);
+
+    Graphics_drawString(g_sContext_p, (int8_t *)"Timer Count:", AUTO_STRING_LENGTH, 10, 10 * 10, true);
+
+    // Preserved
+    static bool isTimerStarted = false;
+
+    if(!isTimerStarted)
+     {
+         config_GAME2_Timer32();
+         isTimerStarted = true;
+     }
 }
 
 void run_GAME2_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile FSM_state *state){
+
+    static int obtained_count_value = 0;
+    char character_array[100];
+
+
+
+    obtained_count_value = return_GAME2_count();
+
+    sprintf(character_array, "Timer Count: %d", obtained_count_value);
+
+    // opaque = true
+    Graphics_drawString(g_sContext_p, (int8_t *)character_array, AUTO_STRING_LENGTH, 10, 10 * 10, true);
+
+
+    // EXIT CONDITION
     if(buttons->LB2tapped){
         initialize_GAME3_Screen(g_sContext_p);
         *state = GAME3;

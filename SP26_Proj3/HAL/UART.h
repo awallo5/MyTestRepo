@@ -53,6 +53,9 @@ void UART_SetBaud_Enable(UART*, UART_Baudrate baudrate);
 
 bool UART_hasChar(UART* uart_p); 
 char UART_getChar(UART* uart_p); 
+
+char UART_getChar2();
+
 bool UART_canSend(UART* uart_p); 
 void UART_sendChar(UART* uart_p, char c);
 

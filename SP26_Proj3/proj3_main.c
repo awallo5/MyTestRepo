@@ -11,6 +11,7 @@
 #include "HAL/Button.h"
 #include "HAL/LED.h"
 #include "HAL/Timer.h"
+#include "HAL/UART.h"
 
 /* Application Header */
 
@@ -288,16 +289,40 @@ void run_GAME2_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile 
 void initialize_GAME3_Screen(Graphics_Context *g_sContext_p){
     Graphics_clearDisplay(g_sContext_p);
     Graphics_drawString(g_sContext_p, (int8_t *)"Project 3: UART", AUTO_STRING_LENGTH, 0, 10, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 0, 10 * 2, false);
-    Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 0, 10 * 3, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"Enter a character", AUTO_STRING_LENGTH, 0, 10 * 2, false);
+    Graphics_drawString(g_sContext_p, (int8_t *)"in the terminal.", AUTO_STRING_LENGTH, 0, 10 * 3, false);
     Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 0, 10 * 4, false);
     Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 5, false);
     Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 6, false);
     Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 7, false);
     Graphics_drawString(g_sContext_p, (int8_t *)"", AUTO_STRING_LENGTH, 4, 10 * 8, false);
+
+    Graphics_drawString(g_sContext_p, (int8_t *)"Typed Character ", AUTO_STRING_LENGTH, 0, 10 * 7, true);
+
+    static UART uart;
+    static bool isUART_Started = false;
+
+    if(!isUART_Started){
+        uart = UART_construct(USB_UART_INSTANCE, USB_UART_PORT, USB_UART_PINS);
+        UART_SetBaud_Enable(&uart, BAUD_9600);
+        isUART_Started = true;
+    }
+
 }
 
 void run_GAME3_FSM(buttons_t *buttons, Graphics_Context *g_sContext_p, volatile FSM_state *state){
+
+    char character_array2[100];
+
+    // Interrupt only occurs with new character... failure condtions?
+    char c = UART_getChar2();
+
+    sprintf(character_array2, "Typed Character %c", c);
+
+    // opaque = true
+    Graphics_drawString(g_sContext_p, (int8_t *)character_array2, AUTO_STRING_LENGTH, 0, 10 * 7, true);
+
+    // EXIT CONDITION
     if(buttons->LB2tapped){
         initialize_GAME4_Screen(g_sContext_p);
         *state = GAME4;
@@ -416,6 +441,7 @@ void main_loop(Graphics_Context *g_sContext_p)
         break;
 
         // GAME LOGIC MOVED TO INDIVIDUAL FSM modules
+        // Each game contains same exit condition to next game sequence
     case GAME1:
        run_GAME1_FSM(&buttons, g_sContext_p, &state);
        break;

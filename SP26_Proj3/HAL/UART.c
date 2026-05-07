@@ -9,6 +9,21 @@
 #include <HAL/Timer.h>
 #include <HAL/UART.h>
 
+static volatile char input_character = 32; // space
+
+void EUSCIA0_IRQHandler(){
+    int stat = UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
+    UART_clearInterruptFlag(EUSCI_A0_BASE, stat);
+
+    if(stat & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
+        input_character = UART_receiveData(EUSCI_A0_BASE);
+    }
+}
+
+char UART_getChar2(){
+    return input_character;
+}
+
 /**
  * Initializes the UART module except for the baudrate generation
  * Except for baudrate generation, all other uart configuration should match
@@ -72,6 +87,9 @@ void UART_SetBaud_Enable(UART* uart_p, UART_Baudrate baudChoice) {
 
   UART_initModule(uart_p->moduleInstance, &uart_p->config);
   UART_enableModule(uart_p->moduleInstance);
+
+  UART_enableInterrupt(uart_p->moduleInstance, EUSCI_A_UART_RECEIVE_INTERRUPT);
+  Interrupt_enableInterrupt(INT_EUSCIA0);
 }
 
 bool UART_hasChar(UART* uart_p) {
